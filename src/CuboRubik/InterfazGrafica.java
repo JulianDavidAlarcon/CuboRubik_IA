@@ -2,75 +2,101 @@ package CuboRubik;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
 public class InterfazGrafica extends JFrame {
-
     private JTextArea areaTexto;
-    private JButton botonCargar, botonIniciar, botonExpandir, botonSolucionar;
-    private JPanel panelBotones, panelCubo;
+    private JTable tabla;
+    private JList<String> listaVector, listaSolucion, listaVariable;
 
     public InterfazGrafica() {
         setTitle("Agente para Solucionar Cubos de Rubik");
-        setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout(10, 10));
+        setSize(850, 650);
+        Container contenedor = new Container();
+        setContentPane(contenedor);
+        //setLayout(new BorderLayout());
 
-        panelCubo = new JPanel();
-        panelCubo.setBorder(BorderFactory.createTitledBorder("Estado del Cubo Rubik"));
-        areaTexto = new JTextArea(20, 50);
-        areaTexto.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        panelCubo.add(new JScrollPane(areaTexto));
-        add(panelCubo, BorderLayout.CENTER);
+        // Panel para la visualización del cubo Rubik
+        JPanel panelCubo = new JPanel();
+        panelCubo.setLayout(null);
+        panelCubo.setLayout(new BorderLayout());
+        areaTexto = new JTextArea(15, 20);
+        panelCubo.add(new JScrollPane(areaTexto), BorderLayout.CENTER);
+        panelCubo.setBounds(10, 10, 550, 400);
+        contenedor.add (panelCubo);
 
-        panelBotones = new JPanel();
-        panelBotones.setLayout(new GridLayout(1, 4, 10, 10));
+        // Panel para las listas Vector y Solución
+        JPanel panelLista1 = new JPanel();
+        panelLista1.add(new JScrollPane(listaVector));
+        panelLista1.setBounds(570, 10, 150, 400);
+        
+        JPanel panelLista2 = new JPanel();
+        panelLista2.add(new JScrollPane(listaSolucion));
+        panelLista2.setBounds(570, 10, 150, 400);
+        
+        JPanel panelLista3 = new JPanel();
+        panelLista3.add(new JScrollPane(listaVariable));
+        panelLista3.setBounds(570, 10, 150, 400);
+        
+        panelLista1.setLayout(new GridLayout());
+        listaVariable = new JList<>();
+        listaVector = new JList<>();
+        listaSolucion = new JList<>();
+        
+        
+        
+        contenedor.add (panelLista1);
 
-        botonCargar = new JButton("Cargar Estado");
-        botonIniciar = new JButton("Iniciar");
-        botonExpandir = new JButton("Expandir");
-        botonSolucionar = new JButton("Solucionar");
+        // botones y entradas
+        JButton botonBuscar = new JButton("Buscar");
+        botonBuscar.setBounds(590, 550, 100, 30);
+        contenedor.add(botonBuscar);
+        
+        JButton botonIniciar = new JButton("Iniciar");
+        botonIniciar.setBounds(590, 510, 100, 30);
+        contenedor.add(botonIniciar);
+        
+        JButton botonExpandir = new JButton("Expandir");
+        botonExpandir.setBounds(700, 510, 100, 30);
+        contenedor.add(botonExpandir);
+        
+        JButton botonSolucionar = new JButton("Solucionar");
+        botonSolucionar.setBounds(700, 550, 100, 30);   
+        contenedor.add(botonSolucionar);
 
-        panelBotones.add(botonCargar);
-        panelBotones.add(botonIniciar);
-        panelBotones.add(botonExpandir);
-        panelBotones.add(botonSolucionar);
 
-        add(panelBotones, BorderLayout.SOUTH);
+        // Agregar componentes al JFrame
+        add(panelCubo, BorderLayout.WEST);
+      //  add(panelListas, BorderLayout.EAST);
+       // add(panelControles, BorderLayout.SOUTH);
 
-        botonCargar.addActionListener(e -> cargarEstadoDesdeArchivo());
+        botonBuscar.addActionListener(this::accionBuscar);
     }
 
-    private void cargarEstadoDesdeArchivo() {
+    private void accionBuscar(ActionEvent e) {
         JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setDialogTitle("Seleccione el archivo de estado inicial");
-
-        int result = fileChooser.showOpenDialog(this);
-        if (result == JFileChooser.APPROVE_OPTION) {
-            String path = fileChooser.getSelectedFile().getAbsolutePath();
-            cargarEstado(path);
+        int resultado = fileChooser.showOpenDialog(this);
+        if (resultado == JFileChooser.APPROVE_OPTION) {
+            cargarArchivo(fileChooser.getSelectedFile().getAbsolutePath());
         }
     }
 
-    private void cargarEstado(String filePath) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+    private void cargarArchivo(String path) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line;
-            StringBuilder builder = new StringBuilder();
+            StringBuilder content = new StringBuilder();
             while ((line = reader.readLine()) != null) {
-                builder.append(line).append("\n");
+                content.append(line).append("\n");
             }
-            areaTexto.setText(builder.toString());
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(this, "Error al cargar el archivo", "Error", JOptionPane.ERROR_MESSAGE);
+            areaTexto.setText(content.toString());
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error al cargar el archivo: " + ex.getMessage(),
+                                          "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            InterfazGrafica interfaz = new InterfazGrafica();
-            interfaz.setVisible(true);
-        });
-    }
 }
