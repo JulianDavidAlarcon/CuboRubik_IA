@@ -3,7 +3,7 @@ package CuboRubik;
 /**
  * 20242008_Inteligencia Artificial_Cun
  * Cubo Rubik_ V1
- * @author Julián Alarcón - Albert Olarte - Sebastian Palacio
+ * Autores: Julián Alarcón, Albert Olarte, Sebastian Palacio
  */
 public class Principal {
 
